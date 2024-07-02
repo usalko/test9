@@ -1,0 +1,7 @@
+# Git ignore for python projects
+
+.vscode
+.venv
+.pip
+
+
