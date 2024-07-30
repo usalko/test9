@@ -1,0 +1,142 @@
+#!/bin/bash
+
+PYTHON_VERSION=3.12
+COMMAND=$1
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+    --python-version)
+        PYTHON_VERSION="$2"
+        shift
+        shift
+        ;;
+    *)
+        COMMAND=$1
+        shift
+        break
+        ;;
+    esac
+    shift
+done
+
+PYTHON=python$PYTHON_VERSION
+# CHECK PYTHON 3
+if command -v "$PYTHON" &>/dev/null; then
+    echo Python3 available
+else
+    echo Python3 not available, please install it or add to the PATH variable
+    exit 1
+fi
+
+# CHECK PIP
+if command -v "$PYTHON" -m pip &>/dev/null; then
+    echo Pip available
+else
+    echo Pip not available, please install it or add to the PATH variable
+    exit 1
+fi
+
+# CHECK VIRTUALENV COMMAND
+if command -v "$PYTHON" -m venv &>/dev/null; then
+    echo Venv command available
+else
+    echo Venv not available, please install it [For example: python3 -m pip install python-venv]
+    exit 1
+fi
+
+# CHECK VENV NOT EXISTS
+if [ ! -d .venv ]; then
+
+    $PYTHON -m venv .venv
+    if [ ! -d .pip ]; then
+        mkdir .pip
+        curl https://bootstrap.pypa.io/get-pip.py -o .pip/get-pip.py
+    fi
+    .venv/bin/python3 .pip/get-pip.py
+    .venv/bin/pip3 install -r requirements.txt
+    .venv/bin/pip3 install poetry==1.7.1 autopep8
+fi
+
+if [ -f '.env' ]; then
+    echo Use .env.dev file to read sensitive information
+    while IPS='=' read -r key _; do
+        eval "${key}"
+    done <'.env'
+else
+    # REGENERATE SENSITIVE INFO FROM TEMPLATE
+    cat >'.env.dev' <<EOF
+
+DEBUG=True
+DISABLE_ANONYMOUS_USER=
+ENABLE_SHARING_DATA_BETWEEN_ACCOUNTS=
+
+DATABASE_EMS_HOST=pg
+DATABASE_EMS_NAME=ems
+DATABASE_EMS_USER=ems
+DATABASE_EMS_PASSWORD=ems
+
+BPLEX_ENDPOINT=https://lk.biacorp.ru
+BPLEX_PUBLIC_URL=
+
+KAFKA_URL=localhost:9092
+
+LOKI_WRITE_URL=http://localhost:3101
+LOKI_READ_URL=http://localhost:3102
+
+MOBILE_LOGS_URL=http://molog:8804
+
+S3_URL=http://localhost:9000
+S3_PUBLIC_URL=locahost:9001
+S3_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+S3_SECRET_ACCESS_KEY=wJalrXUtnFEMI-K7MDENG-bPxRfiCYEXAMPLEKEY
+
+REDIS_URL=redis://localhost:6379/0
+
+# Rws proxy config
+RWS_URL=ws://rws:8802/ws
+# Kws proxy config
+KWS_URL=ws://kws:8801/ws
+
+# Wnen settings is empty read from .chat-bot-token file (place it in project root folder)
+CHAT_BOT_PUBLIC_URL=https://t.me/<bot name>
+CHAT_BOT_TOKEN=
+CHAT_BOT_INTERNAL_WEBHOOK_URL=
+CHAT_BOT_EXTERNAL_WEBHOOK_URL=
+CHAT_BOT_TTL_IN_MINUTES=
+
+# Anonymous mobile login for pass google-play checking
+ANONYMOUS_EMPLOYEE_PHONE=+7
+ANONYMOUS_REGISTRATION_CODE=908235
+DISABLE_ANONYMOUS_EMPLOYEE=
+ENABLE_ANONYMOUS_EMPLOYEE_WRITE_REQUESTS=
+
+PYTHONPATH=sevice
+EOF
+fi
+
+echo EXECUTE
+echo "=========== $COMMAND"
+echo "$COMMAND ==========="
+echo COMMAND
+
+if [ "$COMMAND" == "redeps" ]; then
+    echo "Reinstall dependencies"
+    .venv/bin/pip3 install -r requirements.txt
+    .venv/bin/pip3 install poetry==1.7.1 autopep8
+fi
+
+if [ "$COMMAND" == "clean" ]; then
+    echo "Clean temporary folders"
+    find . -name __pycache__ -print0 | xargs -0 rm -fr
+fi
+
+if [ "$COMMAND" == "tests" ] || [ "$COMMAND" == "test" ]; then
+    echo Run tests
+    .venv/bin/python -m unittests tests
+
+fi
+
+# =================================================================================================
+
+AVAILABLE_COMMANDS="run chatbot build up start stop down finish restart manage tests ems front redeps lock clean log logs publish check"
+echo ''
+[[ $AVAILABLE_COMMANDS =~ (^| )$COMMAND($| ) ]] && echo 'Ok' || echo 'Unknown command: ' "$COMMAND" && echo 'Available commands are: ' "$AVAILABLE_COMMANDS"
