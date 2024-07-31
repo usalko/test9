@@ -11,21 +11,20 @@ class TestDeCasteljau(TestCase):
 
     def test_quadratic_arc(self):
         path = [
-            Point2D(0.1, 0.1),
-            Point2D(0.4, 0.9),
-            Point2D(0.3, 0.3),
-            Point2D(-0.9, -0.4),
-            Point2D(0.1, 0.4),
-            Point2D(0.9, 0.1),
+            complex(0.1, 0.1),
+            complex(0.4, 0.9),
+            complex(0.3, 0.3),
+            complex(-0.9, -0.4),
+            complex(0.1, 0.4),
+            complex(0.9, 0.1),
         ]
         # Simple checkpoint
-        zero_one_point = de_casteljau(path, 0.1)
+        zero_one_point = de_casteljau_complex(path, 0.1)
         self.assertIsNotNone(zero_one_point)
 
         t = np.arange(0, 1, 0.01)
         def de_casteliau_numpy_ufunc_for_custom_path(t: float) -> complex:
-            value = de_casteljau(path, t)
-            return complex(value.x0, value.x1)
+            return de_casteljau_complex(path, t)
 
         # define numpy universal function
         de_casteliau_numpy_ufunc_for_custom_path_ufunc = np.frompyfunc(de_casteliau_numpy_ufunc_for_custom_path, 1, 1)

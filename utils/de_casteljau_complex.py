@@ -1,7 +1,7 @@
 from typing import List
 
 
-def de_casteljau(points: List[complex], t: float) -> complex:
+def de_casteljau_complex(points: List[complex], t: float) -> complex:
     a = 0 + 0j
     b = 0 + 0j
     midpoints = []
