@@ -1,8 +1,13 @@
-# Git ignore for python projects
-
+# Git ignore for python projects\
 .vscode
 .venv
 .pip
 
 # Local environment settings
 .env
+
+# Bytecode cache
+__pycache__
+
+# Test output
+test-output.svg

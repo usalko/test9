@@ -1,2 +1,3 @@
-jupiter
+jupyterlab
 pytest
+matplotlib

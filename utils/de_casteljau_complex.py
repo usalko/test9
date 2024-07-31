@@ -1,19 +1,18 @@
 from typing import List
-from .point2d import Point2D
 
 
-def de_casteljau(points: List[Point2D], t: float) -> Point2D:
-    a = Point2D(0, 0)
-    b = Point2D(0, 0)
+def de_casteljau(points: List[complex], t: float) -> complex:
+    a = 0 + 0j
+    b = 0 + 0j
     midpoints = []
     while len(points) > 1:
         num = len(points) - 1
         for i in range(0, num):
             a = points[i]
             b = points[i+1]
-            midpoints.append(Point2D(
-                a.x0 + (b.x0 - a.x0) * t,
-                a.x1 + (b.x1 - a.x1) * t,   
+            midpoints.append(complex(
+                a.real + (b.real - a.real) * t,
+                a.imag + (b.imag - a.imag) * t,   
             ))
 
         points = midpoints
