@@ -10,4 +10,4 @@
 __pycache__
 
 # Test output
-test-output.svg
+test-output*.svg
