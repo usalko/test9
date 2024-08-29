@@ -11,3 +11,6 @@ __pycache__
 
 # Test output
 test-output*.svg
+
+# Drawio backups
+*.bkp
