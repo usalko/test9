@@ -57,7 +57,7 @@ if [ ! -d .venv ]; then
 fi
 
 if [ -f '.env' ]; then
-    echo Use .env.dev file to read sensitive information
+    echo Use .env file to read sensitive information
     while IPS='=' read -r key _; do
         if [ "${key}" != "" ] && [[ ! "${key}" =~ .*#.* ]]; then
             eval "export ${key}"
@@ -65,7 +65,7 @@ if [ -f '.env' ]; then
     done <'.env'
 else
     # REGENERATE SENSITIVE INFO FROM TEMPLATE
-    cat >'.env.dev' <<EOF
+    cat >'.env' <<EOF
 
 DEBUG=True
 DISABLE_ANONYMOUS_USER=
